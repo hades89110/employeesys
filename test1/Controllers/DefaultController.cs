@@ -11,8 +11,11 @@ namespace test1.Controllers
 {
     public class DefaultController : Controller
     {
-        //連接DB
+
         string connString = "server=127.0.0.1;port=3306;user id=qqq;password=123;database=dbtest;charset=utf8;";
+        MySqlConnection conn = new MySqlConnection();
+
+
 
         public ActionResult Index()
         {
@@ -28,44 +31,35 @@ namespace test1.Controllers
                 ViewBag.Msg = "密碼輸入錯誤";
                 return View(data);
             }
-
-
-            if (AddUserData(data))
-            {
-                Response.Redirect("~/Home/Login");
-                return new EmptyResult();
-            }
             else
             {
-                Response.Redirect("Login");
-                return new EmptyResult();
-            }
-        }
+                conn.ConnectionString = connString;
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
 
-        public bool AddUserData(UserData data)
-        {
-            try
-            {
-                Connect();
-                string id = Guid.NewGuid().ToString();
-                string strSQL = @"INSERT INTO `userdata` (`id`, `account`, `password`, `city`, `village`, `address`)
-                          VALUES (@id, @account, @password, @city, @village, @address)";
-                MySqlCommand cmd = new MySqlCommand(strSQL, conn);
+                string id = "0";
+                string sql = @"INSERT INTO `edata` (`id`, `account`, `password`, `name`, `job`)
+                                VALUES (@id, @account, @password, @name, @job)";
+
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+
                 cmd.Parameters.Add("@id", MySqlDbType.VarChar).Value = id;
                 cmd.Parameters.Add("@account", MySqlDbType.VarChar).Value = data.account;
                 cmd.Parameters.Add("@password", MySqlDbType.VarChar).Value = data.password1;
-                cmd.ExecuteNonQuery();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-            finally
-            {
-                Disconnect();
+                cmd.Parameters.Add("@name", MySqlDbType.VarChar).Value = data.name;
+                cmd.Parameters.Add("@job", MySqlDbType.VarChar).Value = data.job;
+
+                int index = cmd.ExecuteNonQuery();
+                conn.Close();
+
+               ViewBag.Msg = "註冊成功";
+                return View(data);
             }
         }
+
+        
+
+
 
 
 

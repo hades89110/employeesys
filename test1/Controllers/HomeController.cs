@@ -13,16 +13,6 @@ namespace test1.Controllers
             return View();
         }
 
-        public ActionResult View888()
-        {
-            ViewBag.a = "viewbag";
-            ViewBag.asd = 456;
-
-
-
-            return View();
-        }
-
 
         public ActionResult About()
         {
